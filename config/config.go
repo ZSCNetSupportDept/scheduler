@@ -39,8 +39,8 @@ func check() error {
 }
 func debugprint() {
 
-	fmt.Printf("ListenPort=%v", ListenPort)
-	fmt.Printf("File=%v", File)
-	fmt.Printf("database path : %s", DB.Path)
+	fmt.Printf("ListenPort=%v\n", ListenPort)
+	fmt.Printf("File=%v\n", File)
+	fmt.Printf("database path : %s\n", DB.Path)
 
 }
