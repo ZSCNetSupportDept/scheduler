@@ -1,0 +1,8 @@
+# This is a example file for the system
+ListenPort: 25005
+File: "member.csv"
+DB:
+  Path: "scheduler.db"
+  Port: "" # not need if use SQLite
+  User: "" # not need if use SQLite
+  Password: "" # not need if use SQLite
