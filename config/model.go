@@ -13,4 +13,5 @@ type database struct {
 	//Password string
 
 	// enable if you want use an instance other than SQLite
+	Type string
 }

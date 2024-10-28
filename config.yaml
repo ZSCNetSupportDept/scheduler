@@ -6,3 +6,4 @@ DB:
   Port: "" # not need if use SQLite
   User: "" # not need if use SQLite
   Password: "" # not need if use SQLite
+  Type: "SQLite"

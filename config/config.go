@@ -21,6 +21,7 @@ func Load() {
 	File = viper.GetString("File")
 	DB.Path = viper.GetString("DB.Path")
 	//DB.Port = viper.GetString("DB.Port")
+	DB.Type = viper.GetString("DB.Type")
 
 	err := check()
 	if err != nil {
@@ -42,5 +43,6 @@ func debugprint() {
 	fmt.Printf("ListenPort=%v\n", ListenPort)
 	fmt.Printf("File=%v\n", File)
 	fmt.Printf("database path : %s\n", DB.Path)
+	fmt.Printf("database type:%s\n", DB.Type)
 
 }
