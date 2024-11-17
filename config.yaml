@@ -1,9 +1,16 @@
 # This is a example file for the system
 ListenPort: 25005
-File: "member.csv"
 DB:
-  Path: "scheduler.db"
+  Type: "SQLite"
+  Path: "" # not need if use SQLite
   Port: "" # not need if use SQLite
   User: "" # not need if use SQLite
   Password: "" # not need if use SQLite
-  Type: "SQLite"
+  Name: "" # not need if use SQLite
+
+[business]
+Session: "2024-2025" #学年
+Semester: 1 #学期，1 或 2
+StartTime: "2024-9-14" #开始值班的日期
+Week: 15 #准备值班多少周
+File: "member.csv" #成员信息文件的路径，看文档
