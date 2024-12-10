@@ -7,8 +7,7 @@ DB:
   User: "" # not need if use SQLite
   Password: "" # not need if use SQLite
   Name: "" # not need if use SQLite
-
-[business]
+#[business]
 Session: "2024-2025" #学年
 Semester: 1 #学期，1 或 2
 StartTime: "2024-9-14" #开始值班的日期

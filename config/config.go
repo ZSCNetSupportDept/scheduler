@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/viper"
 	"os"
 )
@@ -21,6 +22,13 @@ func Load() {
 	if len(os.Args) != 1 {
 		handleArguments()
 	}
+
+	carbon.SetDefault(carbon.Default{
+		Layout:       carbon.DateTimeLayout,
+		Timezone:     carbon.PRC,
+		WeekStartsAt: carbon.Sunday,
+		Locale:       "zh-CN", // 取值范围：lang 目录下翻译文件名，不包含文件后缀
+	})
 
 }
 
