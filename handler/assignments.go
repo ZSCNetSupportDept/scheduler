@@ -52,34 +52,35 @@ func generateTable() error {
 			male = append(male, i)
 		}
 	}
-	//为女生宿舍分配负责人：
-	for i := 0; i < 4; i++ {
-		for _, x := range female {
-			if (x.Arranged == false) && (x.Access < model.FRESH) {
-				table[i] = append(table[i], x.Name)
-				x.Arranged = true
-			}
-		}
-	}
-	//男生负责人：
-	for i := 0; i < 7; i++ {
-		for _, x := range male {
-			if (x.Arranged == false) && (x.Access < model.FRESH) {
-				table[i] = append(table[i], x.Name)
-				x.Arranged = true
-			}
-		}
-	}
-	//女生成员
+
+	//为女生分配负责人
 	for c, i := range female {
-		if i.Arranged == false {
-			table[(c % 4)] = append(table[(c%4)], i.Name)
+		if i.Access < model.FRESH { //是正式成员
+			table[c%4] = append(table[c%4], i.Name) //轮流分配到女生片区
+			i.Arranged = true
+		}
+
+	}
+	//分配剩下的所有女生到女生片区
+	for c, i := range female {
+		if i.Arranged != true {
+			table[c%4] = append(table[c%4], i.Name)
+			i.Arranged = true
 		}
 	}
-	//男生成员
+
+	//为男生分配负责人
+	for c, i := range male {
+		if i.Access < model.FRESH {
+			table[(c%3)+4] = append(table[(c%3)+4], i.Name)
+			i.Arranged = true
+		}
+	}
+
+	//分配剩下的所有男生
 	for c, i := range male {
 		if i.Arranged == false {
-			table[(c % 7)] = append(table[(c%7)], i.Name)
+			table[c%7] = append(table[c%7], i.Name)
 		}
 	}
 	fmt.Printf("today:%v\n", today)
