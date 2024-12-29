@@ -72,26 +72,27 @@ func generateTable() (*[7][]string, error) {
 		}
 
 	}
-	//分配剩下的所有女生到女生片区
-	for c, i := range female {
-		if i.Arranged != true {
-			table[c%4] = append(table[c%4], i.Name)
+
+	//为剩下的片区分配负责人
+	for _, i := range male {
+		if i.Access < model.FRESH {
+			table[fewest(table)] = append(table[fewest(table)], i.Name)
 			i.Arranged = true
 		}
 	}
 
-	//为男生分配负责人
-	for c, i := range male {
-		if i.Access < model.FRESH {
-			table[(c%3)+4] = append(table[(c%3)+4], i.Name)
+	//分配剩下的所有女生到女生片区
+	for _, i := range female {
+		if i.Arranged != true {
+			table[fewestF(table)] = append(table[fewestF(table)], i.Name)
 			i.Arranged = true
 		}
 	}
 
 	//分配剩下的所有男生
-	for c, i := range male {
+	for _, i := range male {
 		if i.Arranged == false {
-			table[c%7] = append(table[c%7], i.Name)
+			table[fewest(table)] = append(table[fewest(table)], i.Name)
 		}
 	}
 	fmt.Printf("today:%v\n", today)
@@ -116,4 +117,26 @@ func readTableData(m *[]*model.Member) error {
 		fmt.Printf("%v:%v\n", index, member) // for debug concerns
 	}
 	return nil
+}
+
+// 找出人数最少的片区
+func fewest(a [7][]string) int {
+	b := min(len(a[0]), len(a[1]), len(a[2]), len(a[3]), len(a[4]), len(a[5]), len(a[6]))
+	for i := range len(a) {
+		if b == len(a[i]) {
+			return i
+		}
+	}
+	return -1 //error
+}
+
+// 找出人数最少的女生片区
+func fewestF(a [7][]string) int {
+	b := min(len(a[0]), len(a[1]), len(a[2]), len(a[3]))
+	for i := range len(a) - 3 {
+		if b == len(a[i]) {
+			return i
+		}
+	}
+	return -1 //error
 }
