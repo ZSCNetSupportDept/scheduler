@@ -15,23 +15,24 @@ import (
 func GetAssignment(i echo.Context) error {
 	if (carbon.Now().ToDateString() != signals.Table.LastUpdated.ToDateString()) || signals.Table.NeedUpdate == true {
 		fmt.Printf("At %v:start regenerate table", carbon.Now())
-		err := generateTable()
+		data, err := generateTable()
 		if err != nil {
 			i.String(http.StatusInternalServerError, err.Error())
 			return echo.ErrInternalServerError
 		}
+		i.Render(http.StatusOK, "table.html", data)
 		return nil
 	}
 	return nil
 }
-func generateTable() error {
+func generateTable() (*[7][]string, error) {
 
 	table := [7][]string{}       //结果放入这里
 	members := []*model.Member{} //包含所有成员信息的切片
 
 	err := readTableData(&members)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dayOfWeek := carbon.Now().DayOfWeek() //今天星期几
@@ -85,7 +86,7 @@ func generateTable() error {
 	}
 	fmt.Printf("today:%v\n", today)
 	fmt.Printf("table:%v\n", table)
-	return nil
+	return &table, nil
 }
 func readTableData(m *[]*model.Member) error {
 	data, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, os.ModePerm)
