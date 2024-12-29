@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"html/template"
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/database"
 	"zsxyww.com/scheduler/route"
+	"zsxyww.com/scheduler/tl"
 )
 
 func main() {
@@ -23,4 +25,9 @@ func main() {
 func register(app *echo.Echo) {
 	route.Route(app)
 	route.Middleware(app)
+	renderer := tl.tlw{
+		Tl: template.Must(template.ParseGlob("templates/*.html")),
+	}
+	app.Renderer = renderer
+
 }

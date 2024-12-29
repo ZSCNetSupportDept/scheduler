@@ -12,5 +12,5 @@ func Route(app *echo.Echo) {
 	staticFiles.Use(middleware.Static("./FrontEnd"))
 
 	api := app.Group("/api/")
-	api.GET("/getAssignment", handler.GetAssignment)
+	api.GET("getAssignment", handler.GetAssignment)
 }
