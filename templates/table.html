@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-  <head>
-    <meta charset="utf-8">
-    <title></title>
-  </head>
-  <body>
-    <header></header>
-    <main></main>
-    <footer></footer>
-  </body>
-</html>
+<table>
+    {{range .}} <!-- 遍历外层切片 -->
+        <tr>
+            {{range .}} <!-- 遍历内层切片 -->
+                <td>{{.}}</td>
+            {{end}}
+        </tr>
+    {{end}}
+</table>

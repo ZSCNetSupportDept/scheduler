@@ -86,6 +86,9 @@ func generateTable() (*[7][]string, error) {
 	}
 	fmt.Printf("today:%v\n", today)
 	fmt.Printf("table:%v\n", table)
+
+	//测试的时候先注释掉这里
+	//signals.Table.LastUpdated = carbon.Now()
 	return &table, nil
 }
 func readTableData(m *[]*model.Member) error {

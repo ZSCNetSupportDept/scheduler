@@ -8,7 +8,7 @@ import (
 
 func Route(app *echo.Echo) {
 	// here is the route for our site
-	staticFiles := app.Group("/")
+	staticFiles := app.Group("/*")
 	staticFiles.Use(middleware.Static("./FrontEnd"))
 
 	api := app.Group("/api/")

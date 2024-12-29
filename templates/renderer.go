@@ -7,10 +7,10 @@ import (
 )
 
 // template wrapper
-type tlw struct {
+type Tlw struct {
 	Tl *template.Template
 }
 
-func (t tlw) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+func (t Tlw) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
 	return t.Tl.ExecuteTemplate(w, name, data)
 }

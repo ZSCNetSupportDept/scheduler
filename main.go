@@ -7,7 +7,7 @@ import (
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/database"
 	"zsxyww.com/scheduler/route"
-	"zsxyww.com/scheduler/tl"
+	"zsxyww.com/scheduler/templates"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 func register(app *echo.Echo) {
 	route.Route(app)
 	route.Middleware(app)
-	renderer := tl.tlw{
+	renderer := tl.Tlw{
 		Tl: template.Must(template.ParseGlob("templates/*.html")),
 	}
 	app.Renderer = renderer
