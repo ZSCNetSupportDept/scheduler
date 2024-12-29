@@ -7,6 +7,7 @@ type Member struct {
 	FreeDay  int    `csv:"有空"` //哪天有空
 	Access   int    `csv:"权限"` //遵循报修系统的access enum ,用来标注管理层
 	Arranged bool   `csv:"-"`  //供分配程序使用的字段
+	Note     int    `csv:"-"`  //正常=0,换班/补班=1,蹭班=2,供分配程序使用
 }
 
 // 权限：
