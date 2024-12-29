@@ -7,12 +7,17 @@
         </tr>
     {{end}}
 </table>
-<i>备注：每个片区的第一个成员为该片区的负责人</i>
+
+<i class="table_notes"><span class="ZoneHead"></span>片区负责人<br></i>
+<i class="table_notes"><span class="Moderator"></span>管理层<br></i>
+<i class="table_notes"><span class="SwitchOrRepay"></span>换班/补班<br></i>
+<i class="table_notes"><span class="Volunteering"></span>蹭班<br></i>
 
     <style>
         table {
             width: 100%;
             border-collapse: collapse;
+            margin:auto
         }
         th, td {
             border: 1px solid black;
@@ -22,5 +27,40 @@
         td:first-child, th:first-child {
             background-color: #b3d9f7;
             font-weight: bold;
+        }
+        td:nth-child(2), th:nth-child(2) {
+            background-color: #55ffaa
+        }
+        .ZoneHead {
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #55ffaa; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+            align-self: left;
+        }
+        .Moderator {
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #ffa0c9; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+        }
+        .SwitchOrRepay{
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #fff6b5; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+        }
+        .Volunteering{
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #c0ff85; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+        }
+        .table_notes{
+            align-items:left
         }
     </style>
