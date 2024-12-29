@@ -12,17 +12,19 @@ import (
 	"zsxyww.com/scheduler/signals"
 )
 
+var data *[7][]string
+var err error
+
 func GetAssignment(i echo.Context) error {
 	if (carbon.Now().ToDateString() != signals.Table.LastUpdated.ToDateString()) || signals.Table.NeedUpdate == true {
 		fmt.Printf("At %v:start regenerate table", carbon.Now())
-		data, err := generateTable()
+		data, err = generateTable()
 		if err != nil {
 			i.String(http.StatusInternalServerError, err.Error())
 			return echo.ErrInternalServerError
 		}
-		i.Render(http.StatusOK, "table.html", data)
-		return nil
 	}
+	i.Render(http.StatusOK, "table.html", data)
 	return nil
 }
 func generateTable() (*[7][]string, error) {
@@ -39,6 +41,14 @@ func generateTable() (*[7][]string, error) {
 	today := []*model.Member{}            //今天值班的人
 	female := []*model.Member{}           //今天的女生
 	male := []*model.Member{}             //今天的男生
+
+	table[0] = append(table[0], "凤翔")
+	table[1] = append(table[1], "朝晖")
+	table[2] = append(table[2], "香晖AB")
+	table[3] = append(table[3], "香晖CD")
+	table[4] = append(table[4], "东门")
+	table[5] = append(table[5], "北门")
+	table[6] = append(table[6], "歧头")
 
 	for _, i := range members {
 		if i.FreeDay == dayOfWeek {
