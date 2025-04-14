@@ -8,7 +8,9 @@ deploy:
 	chmod +x /opt/zscww_scheduler/scheduler
 	echo "部署脚本执行完成，记得放入member.csv数据文件"
 
-default: build
+default: help
 
 clean:
 	rm ./scheduler
+help:
+	echo "请查看MakeFile文件查看构建选项"
