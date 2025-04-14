@@ -16,13 +16,15 @@ var data *[7][]string
 var err error
 
 func GetAssignment(i echo.Context) error {
-	if (carbon.Now().ToDateString() != signals.Table.LastUpdated.ToDateString()) || signals.Table.NeedUpdate == true {
+	if (carbon.Now().ToDateString() != signals.Table.GetLastUpdated().ToDateString()) || signals.Table.IsNeedUpdate() == true {
 		fmt.Printf("At %v:start regenerate table", carbon.Now())
 		data, err = generateTable()
 		if err != nil {
 			i.String(http.StatusInternalServerError, err.Error())
 			return echo.ErrInternalServerError
 		}
+		//signals.Table.SetUpdated(carbon.Now())
+		//测试时注释掉上面的状态更新方便调试
 	}
 	i.Render(http.StatusOK, "table.html", data)
 	return nil
