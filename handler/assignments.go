@@ -82,7 +82,6 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	//添加标题
 	table[0] = append(table[0], &model.Member{Name: "凤翔"})
 	table[1] = append(table[1], &model.Member{Name: "朝晖"})
@@ -108,7 +107,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	}
 
 	//为女生分配负责人
-	for i := 0; i <= len(female); i++ {
+	for i := 0; i < len(female); i++ {
 		if a := iter(female, i); a.Access < model.FRESH { //是正式成员
 			table[i%4] = append(table[i%4], a) //轮流分配到女生片区
 			a.Arranged = true
@@ -116,7 +115,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	}
 
 	//为剩下的片区分配负责人
-	for i := 0; i <= len(male); i++ {
+	for i := 0; i < len(male); i++ {
 		if a := iter(male, i); a.Access < model.FRESH { //是正式成员
 			table[fewest(table)] = append(table[fewest(table)], a)
 			a.Arranged = true
@@ -124,7 +123,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	}
 
 	//分配剩下的所有女生到女生片区
-	for i := 0; i <= len(female); i++ {
+	for i := 0; i < len(female); i++ {
 		if a := iter(female, i); a.Arranged != true { //还没有安排
 			table[fewestF(table)] = append(table[fewestF(table)], a)
 			a.Arranged = true
@@ -132,7 +131,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	}
 
 	//分配剩下的所有男生
-	for i := 0; i <= len(male); i++ {
+	for i := 0; i < len(male); i++ {
 		if a := iter(male, i); a.Arranged == false { //还没有安排
 			table[fewest(table)] = append(table[fewest(table)], a)
 			a.Arranged = true
