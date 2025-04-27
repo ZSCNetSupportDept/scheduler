@@ -2,6 +2,7 @@ package handler
 
 import (
 	//"fmt"
+	"errors"
 	"github.com/gocarina/gocsv"
 	"github.com/golang-module/carbon/v2"
 	"github.com/labstack/echo/v4"
@@ -18,8 +19,23 @@ var mutex sync.RWMutex //lock for data
 var err error
 
 // /api/getAssignment GET 获取当日值班表，返回html
+// 接受参数date,是需要生成值班表的日期
 func GetAssignment(i echo.Context) error {
 
+	//如果指定了参数，则生成参数指定的
+	if date := i.QueryParam("date"); date != "" {
+		mutex.Lock()
+		data, err = generateTable(carbon.Parse(date))
+		mutex.Unlock()
+
+		if err != nil {
+			i.String(http.StatusInternalServerError, err.Error())
+			return echo.ErrInternalServerError
+		}
+		goto render
+	}
+
+	//如果没有参数，则生成当前时间
 	if (carbon.Now().ToDateString() != signals.Table.GetLastUpdated().ToDateString()) || signals.Table.IsNeedUpdate() == true {
 
 		mutex.Lock()
@@ -34,7 +50,7 @@ func GetAssignment(i echo.Context) error {
 		//signals.Table.SetUpdated(carbon.Now())
 		//测试时注释掉上面的状态更新方便调试
 	}
-
+render:
 	mutex.RLock()
 	i.Render(http.StatusOK, "table.html", data)
 	mutex.RUnlock()
@@ -44,13 +60,17 @@ func GetAssignment(i echo.Context) error {
 
 // 根据指定的时间来生成对应的值班表
 func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
-
 	table := [7][]*model.Member{} //结果放入这里
 	members := []*model.Member{}  //包含所有成员信息的切片
 	today := []*model.Member{}    //今天值班的人
 	female := []*model.Member{}   //今天的女生
 	male := []*model.Member{}     //今天的男生
 	week, dayOfWeek := getWorkDay(time)
+	//检查传入时间有没有问题
+	//TODO:这里好像有bug（对日期是否在值班时间内的判断部分）,不过不怎么影响使用
+	if (week < 0) || (week > config.Week) {
+		return nil, errors.New("Invalid date,the date must lie in our duty period(startTime~startTime+week*7)in config file")
+	}
 
 	// 为了实现更换值班的片区，写的一个闭包切片访问器
 	iter := func(array []*model.Member, i int) *model.Member {
