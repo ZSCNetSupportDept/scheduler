@@ -1,57 +1,78 @@
 package handler
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/gocarina/gocsv"
 	"github.com/golang-module/carbon/v2"
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"os"
+	"sync"
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/model"
 	"zsxyww.com/scheduler/signals"
 )
 
-var data *[7][]string
+var data *[7][]*model.Member
+var mutex sync.RWMutex //lock for data
 var err error
 
+// /api/getAssignment GET 获取当日值班表，返回html
 func GetAssignment(i echo.Context) error {
+
 	if (carbon.Now().ToDateString() != signals.Table.GetLastUpdated().ToDateString()) || signals.Table.IsNeedUpdate() == true {
-		fmt.Printf("At %v:start regenerate table", carbon.Now())
-		data, err = generateTable()
+
+		mutex.Lock()
+		data, err = generateTable(carbon.Now())
+		mutex.Unlock()
+
 		if err != nil {
 			i.String(http.StatusInternalServerError, err.Error())
 			return echo.ErrInternalServerError
 		}
+
 		//signals.Table.SetUpdated(carbon.Now())
 		//测试时注释掉上面的状态更新方便调试
 	}
+
+	mutex.RLock()
 	i.Render(http.StatusOK, "table.html", data)
+	mutex.RUnlock()
+
 	return nil
 }
-func generateTable() (*[7][]string, error) {
 
-	table := [7][]string{}       //结果放入这里
-	members := []*model.Member{} //包含所有成员信息的切片
+// 根据指定的时间来生成对应的值班表
+func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 
+	table := [7][]*model.Member{} //结果放入这里
+	members := []*model.Member{}  //包含所有成员信息的切片
+	today := []*model.Member{}    //今天值班的人
+	female := []*model.Member{}   //今天的女生
+	male := []*model.Member{}     //今天的男生
+	week, dayOfWeek := getWorkDay(time)
+
+	// 为了实现更换值班的片区，写的一个闭包切片访问器
+	iter := func(array []*model.Member, i int) *model.Member {
+		return array[(i+week)%len(array)]
+	}
+
+	//读取csv文件
 	err := readTableData(&members)
 	if err != nil {
 		return nil, err
 	}
 
-	dayOfWeek := carbon.Now().DayOfWeek() //今天星期几
-	today := []*model.Member{}            //今天值班的人
-	female := []*model.Member{}           //今天的女生
-	male := []*model.Member{}             //今天的男生
+	//添加标题
+	table[0] = append(table[0], &model.Member{Name: "凤翔"})
+	table[1] = append(table[1], &model.Member{Name: "朝晖"})
+	table[2] = append(table[2], &model.Member{Name: "香晖AB"})
+	table[3] = append(table[3], &model.Member{Name: "香晖CD"})
+	table[4] = append(table[4], &model.Member{Name: "东门"})
+	table[5] = append(table[5], &model.Member{Name: "北门"})
+	table[6] = append(table[6], &model.Member{Name: "歧头"})
 
-	table[0] = append(table[0], "凤翔")
-	table[1] = append(table[1], "朝晖")
-	table[2] = append(table[2], "香晖AB")
-	table[3] = append(table[3], "香晖CD")
-	table[4] = append(table[4], "东门")
-	table[5] = append(table[5], "北门")
-	table[6] = append(table[6], "歧头")
-
+	//初始化数据
 	for _, i := range members {
 		if i.FreeDay == dayOfWeek {
 			today = append(today, i)
@@ -67,43 +88,41 @@ func generateTable() (*[7][]string, error) {
 	}
 
 	//为女生分配负责人
-	for c, i := range female {
-		if i.Access < model.FRESH { //是正式成员
-			table[c%4] = append(table[c%4], i.Name) //轮流分配到女生片区
-			i.Arranged = true
+	for i := 0; i <= len(female); i++ {
+		if a := iter(female, i); a.Access < model.FRESH { //是正式成员
+			table[i%4] = append(table[i%4], a) //轮流分配到女生片区
+			a.Arranged = true
 		}
-
 	}
 
 	//为剩下的片区分配负责人
-	for _, i := range male {
-		if i.Access < model.FRESH {
-			table[fewest(table)] = append(table[fewest(table)], i.Name)
-			i.Arranged = true
+	for i := 0; i <= len(male); i++ {
+		if a := iter(male, i); a.Access < model.FRESH { //是正式成员
+			table[fewest(table)] = append(table[fewest(table)], a)
+			a.Arranged = true
 		}
 	}
 
 	//分配剩下的所有女生到女生片区
-	for _, i := range female {
-		if i.Arranged != true {
-			table[fewestF(table)] = append(table[fewestF(table)], i.Name)
-			i.Arranged = true
+	for i := 0; i <= len(female); i++ {
+		if a := iter(female, i); a.Arranged != true { //还没有安排
+			table[fewestF(table)] = append(table[fewestF(table)], a)
+			a.Arranged = true
 		}
 	}
 
 	//分配剩下的所有男生
-	for _, i := range male {
-		if i.Arranged == false {
-			table[fewest(table)] = append(table[fewest(table)], i.Name)
+	for i := 0; i <= len(male); i++ {
+		if a := iter(male, i); a.Arranged == false { //还没有安排
+			table[fewest(table)] = append(table[fewest(table)], a)
+			a.Arranged = true
 		}
 	}
-	fmt.Printf("today:%v\n", today)
-	fmt.Printf("table:%v\n", table)
 
-	//测试的时候先注释掉这里
-	//signals.Table.LastUpdated = carbon.Now()
 	return &table, nil
 }
+
+// 读取csv文件
 func readTableData(m *[]*model.Member) error {
 	data, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
@@ -115,14 +134,14 @@ func readTableData(m *[]*model.Member) error {
 	if err != nil {
 		return err
 	}
-	for index, member := range *m {
-		fmt.Printf("%v:%v\n", index, member) // for debug concerns
-	}
+	//for index, member := range *m {
+	//	fmt.Printf("%v:%v\n", index, member) // for debug concerns
+	//}
 	return nil
 }
 
 // 找出人数最少的片区
-func fewest(a [7][]string) int {
+func fewest(a [7][]*model.Member) int {
 	b := min(len(a[0]), len(a[1]), len(a[2]), len(a[3]), len(a[4]), len(a[5]), len(a[6]))
 	for i := range len(a) {
 		if b == len(a[i]) {
@@ -133,7 +152,7 @@ func fewest(a [7][]string) int {
 }
 
 // 找出人数最少的女生片区
-func fewestF(a [7][]string) int {
+func fewestF(a [7][]*model.Member) int {
 	b := min(len(a[0]), len(a[1]), len(a[2]), len(a[3]))
 	for i := range len(a) - 3 {
 		if b == len(a[i]) {
