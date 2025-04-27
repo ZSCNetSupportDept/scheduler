@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/viper"
-	"os"
 )
 
 func Load() {
@@ -26,7 +27,7 @@ func Load() {
 	carbon.SetDefault(carbon.Default{
 		Layout:       carbon.DateTimeLayout,
 		Timezone:     carbon.PRC,
-		WeekStartsAt: carbon.Sunday,
+		WeekStartsAt: carbon.Monday,
 		Locale:       "zh-CN", // 取值范围：lang 目录下翻译文件名，不包含文件后缀
 	})
 
@@ -39,6 +40,10 @@ func check() {
 		os.Exit(1)
 	}
 
+	if startTime := carbon.Parse(StartTime); startTime.IsMonday() != true {
+		fmt.Println("the start time must be a monday")
+		os.Exit(1)
+	}
 }
 func debugprint() {
 
