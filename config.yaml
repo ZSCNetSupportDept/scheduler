@@ -2,7 +2,7 @@
 ListenPort: 25005
 DB:
   Type: "SQLite"
-  Path: "" # not need if use SQLite
+  Path: "./scheduler.db" # not need if use SQLite
   Port: "" # not need if use SQLite
   User: "" # not need if use SQLite
   Password: "" # not need if use SQLite
