@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"os"
@@ -12,13 +13,15 @@ import (
 var err error
 
 func Connect() {
-	if config.DB.Type == "SQLite" {
+	switch config.DB.Type {
+	case "SQLite":
 		connectSQLite()
-	} else {
-		fmt.Println("sorry,we support SQLite only so far,check **DB.Type** entry in the config file")
-		os.Exit(1)
+	case "PostgreSQL":
+		connectPGSQL()
+	default:
+		panic("DBType error")
 	}
-	Main.AutoMigrate(&model.Member{})
+	Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 }
 
 func connectSQLite() {
@@ -28,5 +31,12 @@ func connectSQLite() {
 		fmt.Println(err)
 		os.Exit(1)
 
+	}
+}
+
+func connectPGSQL() {
+	Main, err = gorm.Open(postgres.Open(config.DB.Path))
+	if err != nil {
+		panic(err)
 	}
 }
