@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>值班表生成</title>
+    <style>body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+/*    display: flex;*/
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+input[type="date"] {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+#response {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    text-align: left;
+}</style>
+<style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin:auto
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        td:first-child, th:first-child {
+            background-color: #b3d9f7;
+            font-weight: bold;
+        }
+        td:nth-child(2), th:nth-child(2) {
+            background-color: #55ffaa
+        }
+        .ZoneHead {
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #55ffaa; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+            align-self: left;
+        }
+        .Moderator {
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #ffa0c9; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+        }
+        .SwitchOrRepay{
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #fff6b5; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+        }
+        .Volunteering{
+            display: inline-block;  /* 让颜色块和文字在同一行显示 */
+            width: 1em;  /* 设置颜色块的宽度为1个字的宽度 */
+            height: 1em; /* 设置颜色块的高度为1个字的高度 */
+            background-color: #c0ff85; /* 设置颜色块的背景颜色 */
+            vertical-align: middle; /* 让颜色块垂直居中 */
+        }
+        .cell_ZoneHead {
+            background-color: #55ffaa; /* 设置颜色块的背景颜色 */
+        }
+        .cell_Moderator {
+            background-color: #ffa0c9 !important; /* 设置颜色块的背景颜色 */
+        }
+        .cell_SwitchOrRepay{
+            background-color: #fff6b5; /* 设置颜色块的背景颜色 */
+        }
+        .cell_Volunteering{
+            background-color: #c0ff85; /* 设置颜色块的背景颜色 */
+        }
+        .table_notes{
+            align-items:left
+        }
+</style>
+</head>
+<body>
+    <div class="container">
+        <h1>选择日期</h1>
+        <i>如果不选择的日期的话，则自动获取今天的值班表</i><br></br>
+        <input type="date" id="calendar">
+        <button id="getAssignment">获取值班表</button>
+        <div id="response"></div>
+</div>
+
+    <script src="renderTable.js"></script>
+</body>
+</html>
