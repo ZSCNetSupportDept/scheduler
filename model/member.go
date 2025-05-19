@@ -5,6 +5,7 @@ type Member struct {
 	Name     string `csv:"姓名"`
 	Sex      bool   `csv:"性别"` //不要把女生安排进男生宿舍，male=True
 	FreeDay  int    `csv:"有空"` //哪天有空
+	FreeDay2 int    `csv:"有空"`
 	Access   int    `csv:"权限"` //遵循报修系统的access enum ,用来标注管理层
 	Arranged bool   `csv:"-"`  //供分配程序使用的字段
 	Note     int    `csv:"-"`  //正常=0,换班/补班=1,蹭班=2,供分配程序使用

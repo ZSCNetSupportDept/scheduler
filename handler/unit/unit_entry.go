@@ -1,4 +1,4 @@
-package handler
+package uo
 
 import (
 	"gorm.io/gorm"
@@ -11,6 +11,6 @@ type uoPrototype struct {
 }
 
 func init() {
-	uo := uoPrototype{c: db.Main}
-	_ = uo
+	Uo := &uoPrototype{c: db.Main}
+	_ = Uo
 }

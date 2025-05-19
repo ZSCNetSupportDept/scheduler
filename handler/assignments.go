@@ -18,28 +18,21 @@ var data *[7][]*model.Member
 var mutex sync.RWMutex //lock for data
 var err error
 
-// /api/getAssignment GET 获取当日值班表，返回html
+// /api/getAssignment GET 获取当日值班表
 // 接受参数date,是需要生成值班表的日期
 func GetAssignment(i echo.Context) error {
 
+	//如果没有参数，则生成当前时间
+	arg := carbon.Now()
 	//如果指定了参数，则生成参数指定的
 	if date := i.QueryParam("date"); date != "" {
-		mutex.Lock()
-		data, err = generateTable(carbon.Parse(date))
-		mutex.Unlock()
-
-		if err != nil {
-			i.String(http.StatusInternalServerError, err.Error())
-			return echo.ErrInternalServerError
-		}
-		goto render
+		arg = carbon.Parse(date)
 	}
 
-	//如果没有参数，则生成当前时间
 	if (carbon.Now().ToDateString() != signals.Table.GetLastUpdated().ToDateString()) || signals.Table.IsNeedUpdate() == true {
 
 		mutex.Lock()
-		data, err = generateTable(carbon.Now())
+		data, err = generateTable(arg)
 		mutex.Unlock()
 
 		if err != nil {
@@ -50,9 +43,8 @@ func GetAssignment(i echo.Context) error {
 		//signals.Table.SetUpdated(carbon.Now())
 		//测试时注释掉上面的状态更新方便调试
 	}
-render:
 	mutex.RLock()
-	i.Render(http.StatusOK, "table.html", data)
+	i.JSON(200, data)
 	mutex.RUnlock()
 
 	return nil
@@ -69,7 +61,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	//检查传入时间有没有问题
 	//TODO:这里好像有bug（对日期是否在值班时间内的判断部分）,不过不怎么影响使用
 	if (week < 0) || (week > config.Week) {
-		return nil, errors.New("Invalid date,the date must lie in our duty period(startTime~startTime+week*7)in config file")
+		return nil, errors.New("日期错误，日期需要在本学期的值班日期内并且格式正确")
 	}
 
 	// 为了实现更换值班的片区，写的一个闭包切片访问器
@@ -83,13 +75,13 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 		return nil, err
 	}
 	//添加标题
-	table[0] = append(table[0], &model.Member{Name: "凤翔"})
-	table[1] = append(table[1], &model.Member{Name: "朝晖"})
-	table[2] = append(table[2], &model.Member{Name: "香晖AB"})
-	table[3] = append(table[3], &model.Member{Name: "香晖CD"})
-	table[4] = append(table[4], &model.Member{Name: "东门"})
-	table[5] = append(table[5], &model.Member{Name: "北门"})
-	table[6] = append(table[6], &model.Member{Name: "歧头"})
+	table[0] = append(table[0], &model.Member{Name: "凤翔", Access: 7})
+	table[1] = append(table[1], &model.Member{Name: "朝晖", Access: 7})
+	table[2] = append(table[2], &model.Member{Name: "香晖AB", Access: 7})
+	table[3] = append(table[3], &model.Member{Name: "香晖CD", Access: 7})
+	table[4] = append(table[4], &model.Member{Name: "东门", Access: 7})
+	table[5] = append(table[5], &model.Member{Name: "北门", Access: 7})
+	table[6] = append(table[6], &model.Member{Name: "歧头", Access: 7})
 
 	//初始化数据
 	for _, i := range members {
