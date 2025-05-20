@@ -18,7 +18,7 @@ func main() {
 	app := echo.New()
 	register(app)
 
-	listenAddress := fmt.Sprintf(":%d", config.ListenPort)
+	listenAddress := fmt.Sprintf(":%d", config.Default.App.ListenPort)
 
 	app.Logger.Fatal(app.Start(listenAddress))
 }

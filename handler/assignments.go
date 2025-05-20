@@ -60,7 +60,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	week, dayOfWeek := getWorkDay(time)
 	//检查传入时间有没有问题
 	//TODO:这里好像有bug（对日期是否在值班时间内的判断部分）,不过不怎么影响使用
-	if (week < 0) || (week > config.Week) {
+	if (week < 0) || (week > config.Default.Business.Week) {
 		return nil, errors.New("日期错误，日期需要在本学期的值班日期内并且格式正确")
 	}
 
@@ -135,7 +135,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 
 // 读取csv文件
 func readTableData(m *[]*model.Member) error {
-	data, err := os.OpenFile(config.File, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	data, err := os.OpenFile(config.Default.App.File, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return err
 	}

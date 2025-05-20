@@ -13,11 +13,12 @@ import (
 var err error
 
 func Connect() {
-	switch config.DB.Type {
+	switch config.Default.DB.Type {
 	case "SQLite":
 		connectSQLite()
 	case "PostgreSQL":
-		connectPGSQL()
+		//connectPGSQL()
+		PGSQL()
 	default:
 		panic("DBType error")
 	}
@@ -25,7 +26,7 @@ func Connect() {
 }
 
 func connectSQLite() {
-	Main, err = gorm.Open(sqlite.Open(config.DB.Path), &gorm.Config{})
+	Main, err = gorm.Open(sqlite.Open(config.Default.DB.Path), &gorm.Config{})
 	if err != nil {
 		fmt.Printf("error in connecting to SQLite:")
 		fmt.Println(err)
@@ -35,7 +36,7 @@ func connectSQLite() {
 }
 
 func connectPGSQL() {
-	Main, err = gorm.Open(postgres.Open(config.DB.Path))
+	Main, err = gorm.Open(postgres.Open(config.Default.DB.Path), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}

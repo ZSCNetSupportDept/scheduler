@@ -1,20 +1,26 @@
 package config
 
-var (
-	ListenPort int
-	DB         database
-	Session    string
-	Semester   int
-	StartTime  string
-	Week       int
-	File       string
-)
-
-type database struct {
-	Type     string
-	Path     string
-	Port     int
-	User     string
-	Password string
-	Name     string
+type Config struct {
+	App struct {
+		Name       string `mapstructure:"Name"`
+		ListenPort int    `mapstructure:"ListenPort"`
+		File       string `mapstructure:"File"`
+	} `mapstructure:"app"`
+	DB struct {
+		Type     string `mapstructure:"Tyoe"`
+		Path     string `mapstructure:"Path"`
+		Port     int    `mapstructure:"Port"`
+		User     string `mapstructure:"User"`
+		Password string `mapstructure:"Password"`
+		Name     string `mapstructure:"Name"`
+	} `mapstructure:"DB"`
+	Business struct {
+		Session   string `mapstructure:"Session"`
+		Semester  int    `mapstructure:"Semester"`
+		StartTime string `mapstructure:"StartTime"`
+		Week      int    `mapstructure:"Week"`
+	} `mapstructure:"business"`
 }
+
+var pathToConfigure string
+var Default Config
