@@ -13,7 +13,7 @@ func Load() {
 
 	parseArgs()
 	readconfig()
-	fmt.Println(Default)
+	fmt.Printf("%+v\n", Default)
 
 	carbon.SetDefault(carbon.Default{
 		Layout:       carbon.DateTimeLayout,
@@ -35,7 +35,7 @@ func readconfig() {
 }
 
 func parseArgs() {
-	pflag.String("config", "config.yaml", "the path to config file.")
+	pflag.String("config", "./config.yaml", "the path to config file.")
 	viper.BindPFlags(pflag.CommandLine)
 	pflag.Parse()
 	pathToConfigure = viper.GetString("config")

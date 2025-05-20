@@ -7,7 +7,7 @@ type Config struct {
 		File       string `mapstructure:"File"`
 	} `mapstructure:"app"`
 	DB struct {
-		Type     string `mapstructure:"Tyoe"`
+		Type     string `mapstructure:"Type"`
 		Path     string `mapstructure:"Path"`
 		Port     int    `mapstructure:"Port"`
 		User     string `mapstructure:"User"`
