@@ -1,46 +1,46 @@
+// CRUD的基础操作
 package uo
 
 import (
+	"zsxyww.com/scheduler/database"
 	"zsxyww.com/scheduler/model"
 )
 
 // 增加一项tweak
-func (uo *uoPrototype) addTweak(in *model.Tweak) error {
-	_ = uo.c.Create(in)
-	if uo.c.Error != nil {
-		return uo.c.Error
-	}
-	return nil
+func AddTweak(in *model.Tweak) error {
+	result := db.Main.Create(in)
+	return result.Error
+
 }
 
 // 删除一项tweak
-func (uo *uoPrototype) deleteTweak(in *model.Tweak) error {
-	if uo.c.Error != nil {
-		return uo.c.Error
+func DeleteTweak(in *model.Tweak) error {
+	if db.Main.Error != nil {
+		return db.Main.Error
 	}
 	return nil
 }
 
 // 查询一些tweak，通过IssueID
-func (uo *uoPrototype) getTweakByIssueID(in *model.Tweak) (result []*model.Tweak, err error) {
-	if uo.c.Error != nil {
-		return nil, uo.c.Error
+func GetTweakByIssueID(in *model.Tweak) (result []*model.Tweak, err error) {
+	if db.Main.Error != nil {
+		return nil, db.Main.Error
 	}
 	return nil, nil
 }
 
 // 查询一些tweak，通过一个日期
-func (uo *uoPrototype) getTweakByTime(in *model.Tweak) (result []*model.Tweak, err error) {
-	if uo.c.Error != nil {
-		return nil, uo.c.Error
+func GetTweakByTime(in *model.Tweak) (result []*model.Tweak, err error) {
+	if db.Main.Error != nil {
+		return nil, db.Main.Error
 	}
 	return nil, nil
 }
 
 // 查询一些tweak，通过一个工号
-func (uo *uoPrototype) getTweakByID(in *model.Tweak) (result []*model.Tweak, err error) {
-	if uo.c.Error != nil {
-		return nil, uo.c.Error
+func GetTweakByID(in *model.Tweak) (result []*model.Tweak, err error) {
+	if db.Main.Error != nil {
+		return nil, db.Main.Error
 	}
 	return nil, nil
 }

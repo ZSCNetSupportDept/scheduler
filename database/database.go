@@ -2,10 +2,12 @@ package db
 
 import (
 	"fmt"
+	//"gorm.io/driver/postgres"
+	"os"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"os"
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/model"
 )
@@ -17,12 +19,12 @@ func Connect() {
 	case "SQLite":
 		connectSQLite()
 	case "PostgreSQL":
-		//connectPGSQL()
+		connectPGSQL()
 		PGSQL()
 	default:
 		panic("DBType error")
 	}
-	Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+	//Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 }
 
 func connectSQLite() {
@@ -33,6 +35,7 @@ func connectSQLite() {
 		os.Exit(1)
 
 	}
+	Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 }
 
 func connectPGSQL() {
@@ -40,4 +43,5 @@ func connectPGSQL() {
 	if err != nil {
 		panic(err)
 	}
+	Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 }

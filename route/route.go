@@ -13,4 +13,5 @@ func Route(app *echo.Echo) {
 
 	api := app.Group("/api/")
 	api.GET("getAssignment", handler.GetAssignment)
+	api.GET("test", handler.HandlerTest)
 }

@@ -28,7 +28,7 @@ document.getElementById('getAssignment').addEventListener('click', function () {
                     cell.textContent = item.Name || item.ID;
 
                     // 优先判断 Access 条件
-                    if (item.Access < 5) {
+                    if (item.Access <=3) {
                         cell.classList.add('cell_Moderator');
                     } else if (item.Note === 1) {
                         cell.classList.add('cell_SwitchOrRepay');
