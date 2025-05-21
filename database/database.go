@@ -33,9 +33,10 @@ func connectSQLite() {
 		fmt.Printf("error in connecting to SQLite:")
 		fmt.Println(err)
 		os.Exit(1)
-
 	}
-	Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+	if config.InitDB == true {
+		Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+	}
 }
 
 func connectPGSQL() {
@@ -43,5 +44,7 @@ func connectPGSQL() {
 	if err != nil {
 		panic(err)
 	}
-	Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+	if config.InitDB == true {
+		Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+	}
 }

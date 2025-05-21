@@ -25,6 +25,7 @@ func Load() {
 }
 
 func readconfig() {
+	viper.SetConfigFile(pathToConfigure)
 	if err := viper.ReadInConfig(); err != nil {
 		fmt.Printf("Error reading config file: %v\n", err)
 		os.Exit(1)
@@ -36,8 +37,9 @@ func readconfig() {
 
 func parseArgs() {
 	pflag.String("config", "./config.yaml", "the path to config file.")
+	pflag.Bool("init-db", false, "whether to initialize the database,useful when migrating to a new one.")
 	viper.BindPFlags(pflag.CommandLine)
 	pflag.Parse()
 	pathToConfigure = viper.GetString("config")
-	viper.SetConfigFile(pathToConfigure)
+	InitDB = viper.GetBool("init-db")
 }

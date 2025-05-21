@@ -24,3 +24,4 @@ type Config struct {
 
 var pathToConfigure string
 var Default Config
+var InitDB bool
