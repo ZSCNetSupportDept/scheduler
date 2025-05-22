@@ -1,0 +1,10 @@
+[Unit]
+Description = Scheduler for ZSC Network Support
+After = network.target
+
+[Service]
+ExecStart=/opt/scheduler/tools/start.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
