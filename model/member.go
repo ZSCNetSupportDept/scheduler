@@ -20,3 +20,5 @@ const GROUP = 3  //组长
 const FORMAL = 4 //正式成员
 const FRESH = 5  //实习成员
 const PRE = 6    //前成员
+
+var MemberList []*Member

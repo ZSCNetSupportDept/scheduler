@@ -9,7 +9,6 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"zsxyww.com/scheduler/config"
-	"zsxyww.com/scheduler/model"
 )
 
 var err error
@@ -35,7 +34,7 @@ func connectSQLite() {
 		os.Exit(1)
 	}
 	if config.InitDB == true {
-		Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+		//Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 	}
 }
 
@@ -45,6 +44,6 @@ func connectPGSQL() {
 		panic(err)
 	}
 	if config.InitDB == true {
-		Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+		//Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 	}
 }

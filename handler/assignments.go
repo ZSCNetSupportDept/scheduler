@@ -3,20 +3,16 @@ package handler
 import (
 	//"fmt"
 	"errors"
-	"github.com/gocarina/gocsv"
+	//"github.com/gocarina/gocsv"
 	"github.com/golang-module/carbon/v2"
 	"github.com/labstack/echo/v4"
 	"net/http"
-	"os"
-	"sync"
+	//"os"
+	//"sync"
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/model"
-	"zsxyww.com/scheduler/signals"
+	//"zsxyww.com/scheduler/signals"
 )
-
-var data *[7][]*model.Member
-var mutex sync.RWMutex //lock for data
-var err error
 
 // /api/getAssignment GET 获取当日值班表
 // 接受参数date,是需要生成值班表的日期
@@ -29,51 +25,40 @@ func GetAssignment(i echo.Context) error {
 		arg = carbon.Parse(date)
 	}
 
-	if (carbon.Now().ToDateString() != signals.Table.GetLastUpdated().ToDateString()) || signals.Table.IsNeedUpdate() == true {
+	data, err := generateTable(arg)
 
-		mutex.Lock()
-		data, err = generateTable(arg)
-		mutex.Unlock()
-
-		if err != nil {
-			i.String(http.StatusInternalServerError, err.Error())
-			return echo.ErrInternalServerError
-		}
-
-		//signals.Table.SetUpdated(carbon.Now())
-		//测试时注释掉上面的状态更新方便调试
+	if err != nil {
+		i.String(http.StatusInternalServerError, err.Error())
+		return echo.ErrInternalServerError
 	}
-	mutex.RLock()
-	i.JSON(200, data)
-	mutex.RUnlock()
 
+	i.JSON(200, data)
 	return nil
 }
 
 // 根据指定的时间来生成对应的值班表
 func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
+
 	table := [7][]*model.Member{} //结果放入这里
 	members := []*model.Member{}  //包含所有成员信息的切片
 	today := []*model.Member{}    //今天值班的人
 	female := []*model.Member{}   //今天的女生
 	male := []*model.Member{}     //今天的男生
 	week, dayOfWeek := getWorkDay(time)
+
 	//检查传入时间有没有问题
 	//TODO:这里好像有bug（对日期是否在值班时间内的判断部分）,不过不怎么影响使用
 	if (week < 0) || (week > config.Default.Business.Week) {
 		return nil, errors.New("日期错误，日期需要在本学期的值班日期内并且格式正确")
 	}
 
-	// 为了实现更换值班的片区，写的一个闭包切片访问器
+	// 切片访问函数，用来实现自动更换值班片区的功能
 	iter := func(array []*model.Member, i int) *model.Member {
 		return array[(i+week)%len(array)]
 	}
 
-	//读取csv文件
-	err := readTableData(&members)
-	if err != nil {
-		return nil, err
-	}
+	members = model.MemberList
+
 	//添加标题
 	table[0] = append(table[0], &model.Member{Name: "凤翔", Access: 7})
 	table[1] = append(table[1], &model.Member{Name: "朝晖", Access: 7})
@@ -98,32 +83,32 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 		}
 	}
 
-	//为女生分配负责人
-	for i := 0; i < len(female); i++ {
+	//将所有正式女生分配到女生片区
+	for i := range female {
 		if a := iter(female, i); a.Access < model.FRESH { //是正式成员
 			table[i%4] = append(table[i%4], a) //轮流分配到女生片区
 			a.Arranged = true
 		}
 	}
 
-	//为剩下的片区分配负责人
-	for i := 0; i < len(male); i++ {
+	//将所有正式男生分配到所有片区(优先分配人少的片区)
+	for i := range male {
 		if a := iter(male, i); a.Access < model.FRESH { //是正式成员
 			table[fewest(table)] = append(table[fewest(table)], a)
 			a.Arranged = true
 		}
 	}
 
-	//分配剩下的所有女生到女生片区
-	for i := 0; i < len(female); i++ {
+	//分配剩下的所有女生到女生片区(优先分配人少的片区)
+	for i := range female {
 		if a := iter(female, i); a.Arranged != true { //还没有安排
 			table[fewestF(table)] = append(table[fewestF(table)], a)
 			a.Arranged = true
 		}
 	}
 
-	//分配剩下的所有男生
-	for i := 0; i < len(male); i++ {
+	//分配剩下的所有男生(优先分配人少的片区)
+	for i := range male {
 		if a := iter(male, i); a.Arranged == false { //还没有安排
 			table[fewest(table)] = append(table[fewest(table)], a)
 			a.Arranged = true
@@ -131,24 +116,6 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	}
 
 	return &table, nil
-}
-
-// 读取csv文件
-func readTableData(m *[]*model.Member) error {
-	data, err := os.OpenFile(config.Default.App.File, os.O_RDWR|os.O_CREATE, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	defer data.Close()
-
-	err = gocsv.UnmarshalFile(data, m)
-	if err != nil {
-		return err
-	}
-	//for index, member := range *m {
-	//	fmt.Printf("%v:%v\n", index, member) // for debug concerns
-	//}
-	return nil
 }
 
 // 找出人数最少的片区
