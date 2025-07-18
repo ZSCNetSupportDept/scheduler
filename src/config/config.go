@@ -1,9 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
-	"os"
-	"strconv"
+	"strings"
 
 	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/pflag"
@@ -12,10 +12,12 @@ import (
 
 func Load() {
 
-	parseArgs()
-	readconfig()
-	overrides()
-	fmt.Printf("%+v\n", Default)
+	i, err := Init()
+	if err != nil {
+		panic(err)
+	}
+	Default = *i
+	fmt.Println(Default.String())
 
 	carbon.SetDefault(carbon.Default{
 		Layout:       carbon.DateTimeLayout,
@@ -26,34 +28,61 @@ func Load() {
 
 }
 
-func readconfig() {
-	viper.SetConfigFile(pathToConfigure)
-	if err := viper.ReadInConfig(); err != nil {
-		fmt.Printf("Error reading config file: %v\n", err)
-		os.Exit(1)
-	}
-	if err := viper.Unmarshal(&Default); err != nil {
-		panic(fmt.Errorf("映射配置到结构体失败: %s", err))
-	}
+func Init() (*Config, error) {
 
-	FrontEnd = os.Getenv("FRONTEND")
-}
+	v := viper.New()
 
-func parseArgs() {
-	pflag.String("config", "./config.yaml", "the path to config file.")
-	pflag.Bool("init-db", false, "whether to initialize the database on starting,useful when migrating to a new one.")
-	viper.BindPFlags(pflag.CommandLine)
+	//解析命令行传过来的参数
+	pflag.StringP("config", "c", "", "Path to the configuration file (required).")
+	pflag.String("app.name", "ZSCNetworkSupport Scheduler", "Name of the application")
+	pflag.String("app.listenpath", ":25005", "HTTP listen path")
+	pflag.String("app.memberfile", "members.csv", "Path to the member file")
+	pflag.String("app.frontenddir", "./FrontEnd", "Path to the frontend directory")
+	pflag.String("app.templatedir", "./template", "Path to the template directory")
+
+	pflag.Bool("option.databaseautomigrate", false, "Enable automatic database migration")
+	pflag.Bool("option.debug", false, "Enable debug mode")
+
+	pflag.String("db.type", "SQLite", "Database type (e.g., mysql, sqlite)")
+
+	pflag.String("business.year", "", "Business year")
+	pflag.Int("business.semester", 0, "Current semester")
+	pflag.String("business.starttime", "", "Start time of the semester")
+	pflag.Int("business.week", 0, "Total weeks in the semester")
+
 	pflag.Parse()
-	pathToConfigure = viper.GetString("config")
-	InitDB = viper.GetBool("init-db")
-}
-
-func overrides() {
-	if CSVPath := os.Getenv("CSV_PATH"); CSVPath != "" {
-		Default.App.File = CSVPath
+	if err := v.BindPFlags(pflag.CommandLine); err != nil {
+		return nil, fmt.Errorf("failed to bind command-line flags: %w", err)
 	}
 
-	if ListenPort, err := strconv.Atoi(os.Getenv("LISTEN_PORT")); ListenPort != 0 && err != nil {
-		Default.App.ListenPort = ListenPort
+	//加载环境变量
+	v.BindEnv("db.Path")
+	v.BindEnv("db.User")
+	v.BindEnv("db.Port")
+	v.BindEnv("db.Name")
+	v.BindEnv("db.Passwd")
+	v.SetEnvPrefix("SCHEDULER")
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
+
+	//加载配置文件
+	configFile := v.GetString("config")
+	if configFile == "" {
+		pflag.Usage()
+		return nil, errors.New("the --config flag is required")
 	}
+	v.SetConfigFile(configFile)
+	v.SetConfigType("yaml")
+
+	if err := v.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("failed to read config file '%s': %w", configFile, err)
+	}
+
+	// 导出配置
+	var cfg Config
+	if err := v.Unmarshal(&cfg); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal configuration: %w", err)
+	}
+
+	return &cfg, nil
 }

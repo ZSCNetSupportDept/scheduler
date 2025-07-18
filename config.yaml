@@ -1,18 +1,17 @@
-# 其中有的配置可以通过环境变量覆盖，前端，模板的路径通过环境变量设置
-# 这是一个示例配置文件。
+# 示例配置文件
 app:
   Name: "scheduler for ZSC Network Support staff"
-  ListenPort: 25005
-  File: "member.csv" #成员信息文件的路径，看文档
-DB:
+  ListenPath: ":25005"
+  MemberFile: "member.csv"
+  FrontEndDir: ""
+  TemplateDir: ""
+option:
+  DatabaseAutoMigrate: false
+  Debug: true
+DB: # 数据库的其他信息要通过环境变量传递。
   Type: "SQLite"
-  Path: "./scheduler.db"
-  Port: ""
-  User: ""
-  Password: ""
-  Name: ""
 business:
-  Session: "2024-2025" #学年
-  Semester: 1 #学期，1 或 2
-  StartTime: "2025-3-10" #开始值班的日期，日期必须是星期一
-  Week: 15 #准备值班多少周
+  Year: "2024-2025"
+  Semester: 1
+  StartTime: "2025-3-10"
+  Week: 15

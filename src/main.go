@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
 	"os"
 
@@ -20,6 +19,9 @@ func main() {
 
 	config.Load()
 	db.Connect()
+	if config.Default.Option.DatabaseAutoMigrate == true {
+		db.Main.AutoMigrate(&model.Member{}, &model.Tweak{})
+	}
 
 	app := echo.New()
 	csv() //初始化Model.MemberList
@@ -28,18 +30,16 @@ func main() {
 	route.Middleware(app) //注册中间件
 
 	renderer := tl.Tlw{
-		Tl: template.Must(template.ParseGlob(os.Getenv("TEMPLATE") + "/*.html")),
+		Tl: template.Must(template.ParseGlob(config.Default.App.TemplateDir + "/*.html")),
 	}
 	app.Renderer = renderer //注册模板
 
-	listenAddress := fmt.Sprintf(":%d", config.Default.App.ListenPort)
-
-	app.Logger.Fatal(app.Start(listenAddress)) //启动服务器
+	app.Logger.Fatal(app.Start(config.Default.App.ListenPath)) //启动服务器
 }
 
 // 读取csv文件
 func csv() {
-	data, err := os.OpenFile(config.Default.App.File, os.O_RDWR|os.O_CREATE, os.ModePerm)
+	data, err := os.OpenFile(config.Default.App.MemberFile, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		panic(err)
 	}

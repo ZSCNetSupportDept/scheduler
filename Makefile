@@ -14,7 +14,7 @@ EMBED_FRONTEND = 1
 # **运行配置项**
 
 # 如果运行，使用的配置文件在哪里？
-CONFIG_FILE_PATH = $(PWD)/ignore/secret.yaml
+CONFIG_FILE_PATH = $(PWD)/config.yaml
 # 如果运行，使用的成员信息文件在哪里？
 CSV_PATH = $(PWD)/ignore/aa.csv
 
@@ -24,5 +24,9 @@ LISTEN_PORT = 25005
 TEMPLATE_DIR = $(PWD)/src/templates
 # 前端文件的目录
 FRONTEND_PATH = $(PWD)/src/FrontEnd
+# 数据库路径
+DATABASE = $(PWD)/scheduler.db
+# 额外的参数
+ARGS = ;
 
 include build/Makefile

@@ -1,4 +1,4 @@
-.PHONY: clean help run build
+.PHONY: clean help run build start
 
 help:
 	./build/Help
@@ -15,5 +15,6 @@ build: BackEnd
 
 
 run:
-	TEMPLATE=$(TEMPLATE_DIR) FRONTEND=$(FRONTEND_PATH) CSV_PATH=$(CSV_PATH) $(TARGET_PATH)/scheduler --config $(CONFIG_FILE_PATH)
+	SCHEDULER_DB_PATH="$(DATABASE)" $(TARGET_PATH)/scheduler --config $(CONFIG_FILE_PATH) --app.templatedir $(TEMPLATE_DIR) --app.memberfile $(CSV_PATH) --app.frontenddir $(FRONTEND_PATH) $(ARGS)
 
+start: build run

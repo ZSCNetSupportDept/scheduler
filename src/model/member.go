@@ -22,3 +22,8 @@ const FRESH = 5  //实习成员
 const PRE = 6    //前成员
 
 var MemberList []*Member
+
+// 在数据库中创建一个成员
+func (m *Member) Create() error {
+	return nil
+}
