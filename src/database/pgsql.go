@@ -3,8 +3,12 @@ package db
 import (
 	"context"
 	"fmt"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"os"
+
+	//"gorm.io/driver/postgres"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 	"zsxyww.com/scheduler/config"
 )
 
@@ -23,4 +27,11 @@ func PGSQL() {
 
 	fmt.Println("Connected to:", version)
 	PGX = pgx
+}
+
+func connectPGSQL() {
+	Main, err = gorm.Open(postgres.Open(config.Default.DB.Path), &gorm.Config{})
+	if err != nil {
+		panic(err)
+	}
 }

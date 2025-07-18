@@ -1,17 +1,13 @@
 package handler
 
 import (
-	//"fmt"
 	"errors"
-	//"github.com/gocarina/gocsv"
+	"net/http"
+
 	"github.com/golang-module/carbon/v2"
 	"github.com/labstack/echo/v4"
-	"net/http"
-	//"os"
-	//"sync"
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/model"
-	//"zsxyww.com/scheduler/signals"
 )
 
 // /api/getAssignment GET 获取当日值班表

@@ -2,38 +2,38 @@ package main
 
 import (
 	"fmt"
-	"github.com/gocarina/gocsv"
-	"github.com/labstack/echo/v4"
 	"html/template"
 	"os"
+
+	"github.com/gocarina/gocsv"
+	"github.com/labstack/echo/v4"
 	"zsxyww.com/scheduler/config"
-	"zsxyww.com/scheduler/database"
+	db "zsxyww.com/scheduler/database"
 	"zsxyww.com/scheduler/model"
 	"zsxyww.com/scheduler/route"
-	"zsxyww.com/scheduler/templates"
+	tl "zsxyww.com/scheduler/templates"
 )
 
 func main() {
+
+	//进行各种初始化工作：
 
 	config.Load()
 	db.Connect()
 
 	app := echo.New()
-	register(app)
-	csv()
+	csv() //初始化Model.MemberList
 
-	listenAddress := fmt.Sprintf(":%d", config.Default.App.ListenPort)
-
-	app.Logger.Fatal(app.Start(listenAddress))
-}
-func register(app *echo.Echo) {
-	route.Route(app)
-	route.Middleware(app)
+	route.Route(app)      //注册路由表
+	route.Middleware(app) //注册中间件
 	renderer := tl.Tlw{
 		Tl: template.Must(template.ParseGlob("templates/*.html")),
 	}
-	app.Renderer = renderer
+	app.Renderer = renderer //注册模板
 
+	listenAddress := fmt.Sprintf(":%d", config.Default.App.ListenPort)
+
+	app.Logger.Fatal(app.Start(listenAddress)) //启动服务器
 }
 
 // 读取csv文件

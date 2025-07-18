@@ -1,9 +1,10 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"time"
-	"zsxyww.com/scheduler/database"
+
+	"gorm.io/gorm"
+	db "zsxyww.com/scheduler/database"
 )
 
 // 这个结构体是供数据库使用的表结构，换班补班蹭班的记录都会以这种方式储存

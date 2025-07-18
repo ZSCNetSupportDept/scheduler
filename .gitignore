@@ -1,5 +1,4 @@
-scheduler
-scheduler.db
-
-
 ignore/*
+build/target/*
+
+

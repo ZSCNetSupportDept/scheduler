@@ -2,10 +2,8 @@ package db
 
 import (
 	"fmt"
-	//"gorm.io/driver/postgres"
 	"os"
 
-	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"zsxyww.com/scheduler/config"
@@ -23,7 +21,6 @@ func Connect() {
 	default:
 		panic("DBType error")
 	}
-	//Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 }
 
 func connectSQLite() {
@@ -32,18 +29,5 @@ func connectSQLite() {
 		fmt.Printf("error in connecting to SQLite:")
 		fmt.Println(err)
 		os.Exit(1)
-	}
-	if config.InitDB == true {
-		//Main.AutoMigrate(&model.Member{}, &model.Tweak{})
-	}
-}
-
-func connectPGSQL() {
-	Main, err = gorm.Open(postgres.Open(config.Default.DB.Path), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-	if config.InitDB == true {
-		//Main.AutoMigrate(&model.Member{}, &model.Tweak{})
 	}
 }
