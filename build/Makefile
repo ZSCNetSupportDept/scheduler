@@ -15,5 +15,5 @@ build: BackEnd
 
 
 run:
-	$(TARGET_PATH)/scheduler --config $(CONFIG_FILE_PATH) --csv-path $(CSV_PATH)
+	TEMPLATE=$(TEMPLATE_DIR) FRONTEND=$(FRONTEND_PATH) CSV_PATH=$(CSV_PATH) $(TARGET_PATH)/scheduler --config $(CONFIG_FILE_PATH)
 

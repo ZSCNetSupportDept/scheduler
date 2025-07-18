@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/golang-module/carbon/v2"
 	"github.com/spf13/pflag"
@@ -34,21 +35,25 @@ func readconfig() {
 	if err := viper.Unmarshal(&Default); err != nil {
 		panic(fmt.Errorf("映射配置到结构体失败: %s", err))
 	}
+
+	FrontEnd = os.Getenv("FRONTEND")
 }
 
 func parseArgs() {
 	pflag.String("config", "./config.yaml", "the path to config file.")
 	pflag.Bool("init-db", false, "whether to initialize the database on starting,useful when migrating to a new one.")
-	pflag.String("csv-path", "./member.csv", "the CSV file containing member information")
 	viper.BindPFlags(pflag.CommandLine)
 	pflag.Parse()
 	pathToConfigure = viper.GetString("config")
 	InitDB = viper.GetBool("init-db")
-	CSVPath = viper.GetString("csv-path")
 }
 
 func overrides() {
-	if CSVPath != "" {
+	if CSVPath := os.Getenv("CSV_PATH"); CSVPath != "" {
 		Default.App.File = CSVPath
+	}
+
+	if ListenPort, err := strconv.Atoi(os.Getenv("LISTEN_PORT")); ListenPort != 0 && err != nil {
+		Default.App.ListenPort = ListenPort
 	}
 }

@@ -27,8 +27,10 @@ func main() {
 	route.Route(app)      //注册路由表
 	route.Middleware(app) //注册中间件
 
-	// 暂时在初始化时不注册模板，因为用不上
-	//registerTemplate(app) //注册模板
+	renderer := tl.Tlw{
+		Tl: template.Must(template.ParseGlob(os.Getenv("TEMPLATE") + "/*.html")),
+	}
+	app.Renderer = renderer //注册模板
 
 	listenAddress := fmt.Sprintf(":%d", config.Default.App.ListenPort)
 
@@ -47,11 +49,4 @@ func csv() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func registerTemplate(app *echo.Echo) {
-	renderer := tl.Tlw{
-		Tl: template.Must(template.ParseGlob("templates/*.html")),
-	}
-	app.Renderer = renderer
 }

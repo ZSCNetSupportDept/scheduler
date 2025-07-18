@@ -26,4 +26,4 @@ type Config struct {
 var pathToConfigure string //配置文件的路径
 var Default Config         //系统的默认配置
 var InitDB bool
-var CSVPath string
+var FrontEnd string

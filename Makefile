@@ -18,4 +18,11 @@ CONFIG_FILE_PATH = $(PWD)/ignore/secret.yaml
 # 如果运行，使用的成员信息文件在哪里？
 CSV_PATH = $(PWD)/ignore/aa.csv
 
+# 运行端口
+LISTEN_PORT = 25005
+# 模板文件的目录
+TEMPLATE_DIR = $(PWD)/src/templates
+# 前端文件的目录
+FRONTEND_PATH = $(PWD)/src/FrontEnd
+
 include build/Makefile
