@@ -1,3 +1,4 @@
+// 系统配置
 package config
 
 type Config struct {
@@ -22,6 +23,7 @@ type Config struct {
 	} `mapstructure:"business"`
 }
 
-var pathToConfigure string
-var Default Config
+var pathToConfigure string //配置文件的路径
+var Default Config         //系统的默认配置
 var InitDB bool
+var CSVPath string

@@ -2,13 +2,28 @@ package handler
 
 import (
 	"errors"
-	"net/http"
 
 	"github.com/golang-module/carbon/v2"
 	"github.com/labstack/echo/v4"
 	"zsxyww.com/scheduler/config"
 	"zsxyww.com/scheduler/model"
 )
+
+// 一个值班表有7行，每行一个片区，第一个人是片区负责人
+// 片区数暂时是硬编码的
+type table_t [7][]*model.Member
+
+// 为每个行添加标题
+func addZoneName(table *table_t) {
+	//添加标题
+	table[0] = append(table[0], &model.Member{Name: "凤翔", Access: 7})
+	table[1] = append(table[1], &model.Member{Name: "朝晖", Access: 7})
+	table[2] = append(table[2], &model.Member{Name: "香晖AB", Access: 7})
+	table[3] = append(table[3], &model.Member{Name: "香晖CD", Access: 7})
+	table[4] = append(table[4], &model.Member{Name: "东门", Access: 7})
+	table[5] = append(table[5], &model.Member{Name: "北门", Access: 7})
+	table[6] = append(table[6], &model.Member{Name: "歧头", Access: 7})
+}
 
 // /api/getAssignment GET 获取当日值班表
 // 接受参数date,是需要生成值班表的日期
@@ -24,8 +39,8 @@ func GetAssignment(i echo.Context) error {
 	data, err := generateTable(arg)
 
 	if err != nil {
-		i.String(http.StatusInternalServerError, err.Error())
-		return echo.ErrInternalServerError
+		i.String(500, err.Error())
+		return err
 	}
 
 	i.JSON(200, data)
@@ -33,13 +48,13 @@ func GetAssignment(i echo.Context) error {
 }
 
 // 根据指定的时间来生成对应的值班表
-func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
+func generateTable(time carbon.Carbon) (*table_t, error) {
 
-	table := [7][]*model.Member{} //结果放入这里
-	members := []*model.Member{}  //包含所有成员信息的切片
-	today := []*model.Member{}    //今天值班的人
-	female := []*model.Member{}   //今天的女生
-	male := []*model.Member{}     //今天的男生
+	table := table_t{}           //结果放入这里
+	members := []*model.Member{} //包含所有成员信息的切片
+	today := []*model.Member{}   //今天值班的人
+	female := []*model.Member{}  //今天的女生
+	male := []*model.Member{}    //今天的男生
 	week, dayOfWeek := getWorkDay(time)
 
 	//检查传入时间有没有问题
@@ -56,13 +71,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 	members = model.MemberList
 
 	//添加标题
-	table[0] = append(table[0], &model.Member{Name: "凤翔", Access: 7})
-	table[1] = append(table[1], &model.Member{Name: "朝晖", Access: 7})
-	table[2] = append(table[2], &model.Member{Name: "香晖AB", Access: 7})
-	table[3] = append(table[3], &model.Member{Name: "香晖CD", Access: 7})
-	table[4] = append(table[4], &model.Member{Name: "东门", Access: 7})
-	table[5] = append(table[5], &model.Member{Name: "北门", Access: 7})
-	table[6] = append(table[6], &model.Member{Name: "歧头", Access: 7})
+	addZoneName(&table)
 
 	//初始化数据
 	for _, i := range members {
@@ -115,7 +124,7 @@ func generateTable(time carbon.Carbon) (*[7][]*model.Member, error) {
 }
 
 // 找出人数最少的片区
-func fewest(a [7][]*model.Member) int {
+func fewest(a table_t) int {
 	b := min(len(a[0]), len(a[1]), len(a[2]), len(a[3]), len(a[4]), len(a[5]), len(a[6]))
 	for i := range len(a) {
 		if b == len(a[i]) {
@@ -126,7 +135,7 @@ func fewest(a [7][]*model.Member) int {
 }
 
 // 找出人数最少的女生片区
-func fewestF(a [7][]*model.Member) int {
+func fewestF(a table_t) int {
 	b := min(len(a[0]), len(a[1]), len(a[2]), len(a[3]))
 	for i := range len(a) - 3 {
 		if b == len(a[i]) {
